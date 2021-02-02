@@ -1,0 +1,101 @@
+#!/bin/bash
+
+. lab1-cleanup 2> /dev/null
+
+# task 1
+mkdir ~/test
+
+# task 2
+find /etc/ -type f | xargs -L1 -I{} basename "{}" > ~/test/list
+find /etc/ -type d >> ~/test/list
+
+# task 3
+find /etc -type d | wc -l >> ~/test/list
+find /etc -type f -name ".*" | wc -l >> ~/test/list
+
+# task 4
+mkdir test/links
+
+# task 5
+ln test/list test/links/list_hlink
+# task 6
+ln -s test/list test/links/list_slink
+
+# task 7
+listHlinkInode=($(ls -i test/links/list_hlink))
+listInode=($(ls -i test/list))
+listSlinkInode=($(ls -i test/links/list_slink))
+
+echo "list_hlink" $(find / -inum $listHlinkInode 2> /dev/null | wc -l)
+echo "list" $(find / -inum $listInode 2> /dev/null | wc -l)
+echo "list_slink" $(find / -inum $listSlinkInode 2> /dev/null | wc -l)
+
+# task 8
+wc -l test/list >> test/links/list_hlink
+
+# task 9
+cmp test/links/list_hlink $(readlink test/links/list_slink) && echo "YES" || echo "NO"
+
+# task 10=
+mv test/list test/list1
+
+# task 11
+cmp test/links/list_hlink $(readlink test/links/list_slink) 2> /dev/null && echo "YES" || echo "NO"
+
+# task 12
+ln test/list_link ~/list1
+
+# task 13
+sudo find /etc -name *.conf -type f > ~/list_conf
+
+# task 14
+sudo find /etc -name *.d -type d > ~/list_d
+
+# task 15
+cat ~/list_conf ~/list_d > ~/list_conf_d
+
+# task 16
+mkdir ~/test/.sub
+
+# task 17
+cp ~/list_conf_d ~/test/.sub/
+
+# task 18
+cp --backup ~/list_conf_d ~/test/.sub/
+
+# task 19
+find ~/test
+
+# task 20
+man man > ~/man.txt
+
+# task 21
+split -C 1k ~/man.txt man_part_
+
+# task 22
+mkdir ~/man.dir
+
+# task 23
+mv man_part_* ~/man.dir
+
+# task 24
+cat ~/man.dir/man_part_* > ~/man.dir/man.txt
+
+# task 25
+cmp ~/man.txt ~/man.dir/man.txt && echo "YES" || echo "NO"
+
+# task 26
+sed -i 'Test' ~/man.txt
+echo "test" >> ~/man.txt
+
+# task 27
+diff -u ~/man.dir/man.txt ~/man.txt > man.patch
+
+# task 28
+mv man.patch ~/man.dir/man.patch
+
+# task 29
+patch ~/man.dir/man.txt < ~/man.dir/man.patch
+
+# task 30
+cmp ~/man.txt ~/man.dir/man.txt && echo "YES" || echo "NO"
